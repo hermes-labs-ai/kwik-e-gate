@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20, 22, 24]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install
+      - run: npm run lint
+      - run: npm test
+
+  marketplace-action:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Run root Marketplace action
+        id: gate
+        uses: ./
+        with:
+          mode: full
+          repair: "false"
+          post-comment: "false"
+          artifact-name: quick-gate-root
+      - name: Check root action output forwarding
+        env:
+          GATE_STATUS: ${{ steps.gate.outputs.status }}
+          REPAIR_STATUS: ${{ steps.gate.outputs.repair-status }}
+        run: |
+          test "$GATE_STATUS" = pass
+          test "$REPAIR_STATUS" = skipped
+
+  quality-gate-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22, 24]
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Run repository quality gate
+        id: gate
+        uses: ./.github/actions/quick-gate
+        with:
+          mode: full
+          repair: "false"
+          post-comment: "false"
+          node-version: ${{ matrix.node-version }}
+          artifact-name: quick-gate-node-${{ matrix.node-version }}
+      - name: Check public action outputs
+        env:
+          GATE_STATUS: ${{ steps.gate.outputs.status }}
+          REPAIR_STATUS: ${{ steps.gate.outputs.repair-status }}
+        run: |
+          test "$GATE_STATUS" = pass
+          test "$REPAIR_STATUS" = skipped
+
+  quality-gate:
+    needs: quality-gate-matrix
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Require every matrix gate to pass
+        env:
+          MATRIX_RESULT: ${{ needs.quality-gate-matrix.result }}
+        run: test "$MATRIX_RESULT" = success

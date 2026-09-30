@@ -1,0 +1,47 @@
+{
+  "@context": "https://w3id.org/codemeta/3.1",
+  "@type": "SoftwareSourceCode",
+  "name": "kwik-e-gate",
+  "description": "Local deterministic checks and content-bound receipts for coding agents, with optional JS/TS and Python diagnostics adapters",
+  "codeRepository": "https://github.com/hermes-labs-ai/kwik-e-gate",
+  "version": "0.4.0",
+  "license": "https://spdx.org/licenses/Apache-2.0",
+  "programmingLanguage": [
+    "Python",
+    "JavaScript"
+  ],
+  "runtimePlatform": [
+    "Python >=3.11 and Git (core)",
+    "Node.js >=18 (optional JS adapter)"
+  ],
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Rolando",
+      "familyName": "Bosch Rodriguez",
+      "identifier": "https://orcid.org/0009-0005-4896-1112"
+    }
+  ],
+  "url": "https://github.com/hermes-labs-ai/kwik-e-gate",
+  "keywords": [
+    "ai-agents",
+    "ai-reliability",
+    "auto-repair",
+    "ci",
+    "ci-cd",
+    "code-quality",
+    "devtools",
+    "eslint",
+    "frontend",
+    "gemini-cli-extension",
+    "hermes-labs",
+    "javascript",
+    "lighthouse",
+    "linting",
+    "nodejs",
+    "quality-gate",
+    "static-analysis",
+    "typecheck",
+    "typescript"
+  ]
+}

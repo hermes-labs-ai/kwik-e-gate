@@ -1,0 +1,32 @@
+# Example: Add this workflow to your TypeScript/ESLint repository to run Quick Gate on every PR.
+# Copy this file to .github/workflows/quick-gate.yml in your project.
+
+name: Quick Gate
+
+on:
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Quick Gate
+        # Release-only: replace this marker with the immutable SHA of a release
+        # that includes the root action. Do not substitute @main.
+        uses: hermes-labs-ai/quick-gate-js@<RELEASE_COMMIT_SHA>
+        with:
+          mode: quick
+          repair: "false"
+          max-attempts: "2"
+          post-comment: "false"

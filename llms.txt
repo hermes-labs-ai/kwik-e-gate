@@ -1,0 +1,14 @@
+# kwik-e-gate
+
+Local deterministic checks and content-bound receipts for coding agents.
+Python 3.11+ and Git; zero core runtime dependencies. No model or API is required.
+
+- README.md: source install and plan → run → verify workflow.
+- docs/CONFIGURATION.md: repository-owned checks, routing and optional adapters.
+- docs/QUICK-GATE-JS.md: compatible npm quick-gate CLI/API and explicit repair.
+- docs/MIGRATION.md: versions, existing users, Actions and release sequence.
+
+The 0.4.0 consolidated candidate is local and unreleased. Run always returns a
+PASS/FAIL receipt. PASS proves the declared checks ran against the bound inputs;
+it is not proof of correctness or authorization to publish. plan is read-only;
+verify rejects stale evidence. Optional model review is a separate command.

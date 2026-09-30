@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=70"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kwik-e-gate"
+version = "0.4.0"
+description = "Local code gates and receipts for coding agents"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.11"
+dependencies = ["hermes-gate==0.4.0"]
+authors = [{ name = "Hermes Labs", email = "roli@hermes-labs.ai" }]
+keywords = ["coding-agent", "quality-assurance", "receipts", "ci"]
+
+[project.urls]
+Documentation = "https://github.com/hermes-labs-ai/kwik-e-gate#readme"
+Repository = "https://github.com/hermes-labs-ai/kwik-e-gate"
+Issues = "https://github.com/hermes-labs-ai/kwik-e-gate/issues"
+
+[tool.setuptools]
+packages = []

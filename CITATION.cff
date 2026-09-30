@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "kwik-e-gate: local checks and content-bound receipts for coding agents"
+type: software
+authors:
+  - family-names: "Bosch Rodriguez"
+    given-names: "Rolando"
+    orcid: "https://orcid.org/0009-0005-4896-1112"
+    affiliation: "Hermes Labs"
+version: "0.4.0"
+license: "Apache-2.0"
+repository-code: "https://github.com/hermes-labs-ai/kwik-e-gate"
+url: "https://github.com/hermes-labs-ai/kwik-e-gate"
+repository-artifact: "https://www.npmjs.com/package/quick-gate"
+keywords:
+  - "quality gate"
+  - "ci-cd"
+  - "typescript"
+  - "eslint"
+  - "lighthouse"
+  - "evidence-first"
+  - "auto-repair"
+abstract: "kwik-e-gate is a local deterministic gate that selects repository-owned checks and issues receipts bound to what ran. Its Python core has zero runtime dependencies. The optional quick-gate npm adapter preserves JS/TS diagnostics, its standalone API and explicit bounded repair. Model review is optional."

@@ -1,0 +1,57 @@
+{
+  "name": "quick-gate",
+  "version": "0.4.0",
+  "description": "Optional JS/TS checks and diagnostics adapter for KWIK-E-GATE, with a standalone CLI and API",
+  "type": "module",
+  "exports": {
+    ".": "./src/api.js",
+    "./cli": "./src/cli.js"
+  },
+  "bin": {
+    "quick-gate": "src/cli.js"
+  },
+  "files": [
+    "src/*.js",
+    "schemas/*.json",
+    "docs/assets/kwik-e-gate-header.jpg",
+    "docs/QUICK-GATE-JS.md"
+  ],
+  "scripts": {
+    "lint": "for file in src/*.js test/*.test.js; do node --check \"$file\" || exit 1; done",
+    "pretest": "npm install --ignore-scripts --prefix fixtures/lab/clean && npm install --ignore-scripts --prefix fixtures/lab/broken",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "Apache-2.0",
+  "author": "Hermes Labs <roli@hermes-labs.ai> (https://hermes-labs.ai)",
+  "homepage": "https://github.com/hermes-labs-ai/kwik-e-gate",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hermes-labs-ai/kwik-e-gate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hermes-labs-ai/kwik-e-gate/issues"
+  },
+  "keywords": [
+    "quality-gate",
+    "js-ci",
+    "ci",
+    "lint",
+    "typecheck",
+    "lighthouse",
+    "auto-repair",
+    "deterministic",
+    "eslint",
+    "typescript",
+    "nextjs",
+    "react",
+    "vue",
+    "svelte"
+  ],
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1"
+  }
+}

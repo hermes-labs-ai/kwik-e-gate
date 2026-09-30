@@ -1,0 +1,5 @@
+{
+  "name": "quick-gate-js",
+  "version": "0.4.0",
+  "description": "Run Quick Gate CLI 0.4.0 as one deterministic JavaScript/TypeScript gate and read its gate-result/v1 verdict"
+}

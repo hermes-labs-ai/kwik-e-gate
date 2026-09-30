@@ -1,0 +1,90 @@
+# kwik-e-gate changelog
+
+## 0.4.0 — unreleased consolidated candidate
+
+- Bring the dependency-free receipt/routing core into the existing Quick Gate JS
+  repository while retaining npm/PyPI package and JS Action contracts.
+- Add the source-pinned core Action at `.github/actions/kwik-e-gate`: no PyPI download.
+- Add the `kwik-e-gate` CLI and a metadata-only PyPI install package that pulls in the
+  same-version `hermes-gate` engine; retain existing command and import contracts.
+- Move the JS Actions' default Node runtime from 20 to 24; retain explicit runtime inputs.
+- Bind PASS to checked input, execution contract and implementation; reject mutation,
+  stale reuse and entirely skipped checks.
+- Explain local fast/full selection and always emit a terminal run receipt.
+- Keep JS repair deterministic by default; model assistance is explicit opt-in.
+- Include the supplied product header and the preserved scanner-scope demo trace.
+
+## Prior JavaScript adapter history
+
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [Unreleased] — 0.4.0 candidate
+
+- Define this package as the optional JS/TS adapter and standalone compatibility surface for KWIK-E-GATE.
+- Make repair deterministic by default; `--model-assisted` or API `deterministicOnly: false` explicitly opts into Ollama.
+- Reject all-skipped evaluations as `NO_CHECKS_EXECUTED`.
+- Include unsafe-shell permission in configuration identity; preserve canonical result-schema bytes and existing bin/API/mode surfaces.
+- Update the portable agent skill without implicit package downloads.
+
+## [0.3.2] - 2026-09-20
+
+### Added
+- Added one portable agent plugin and skill for Claude Code, Codex CLI, Gemini CLI, and compatible Agent Skills hosts.
+- Added a root-level Marketplace action wrapper that forwards the existing nested Action contract while defaulting `repair` and `post-comment` to `false`.
+
+### Changed
+- Switched npm publication to trusted publishing with GitHub OIDC and provenance.
+- Clarified the distinct npm, repository, and agent-plugin version surfaces and the exact install/runtime readbacks for each.
+
+### Fixed
+- Added an optional `artifact-name` action input so matrix jobs can preserve separate reports without Artifact v4 name conflicts.
+- Return `skipped` in the action’s `repair-status` output when repair is not run. Repository CI exercises both outputs across two Node versions.
+- Preserved a stable aggregate quality-gate check while exercising the action across its Node.js matrix.
+
+`v0.3.1` was a GitHub-only agent-plugin tag and was not published to npm. `0.3.2` reunifies the package and repository release line.
+
+## [0.3.0] - 2026-09-07
+
+### Added
+- `node src/evidence.js`: emit a `run` evaluation as a Hermes Reliability Lab result envelope (tool, version, status, input hash, per-check and per-finding evidence, exit code, timestamp, Git commit) with the ordinary `gate-result/v1` payload embedded verbatim. No change to gate resolution or scoring.
+
+### Fixed
+- Made the composite action return a failing status when gate failures remain unresolved, after preserving its report and artifacts.
+- Moved the copyable Quick Gate workflow example out of the active workflow directory so it does not run against this repository's intentionally minimal package scripts.
+
+## [0.2.2] - 2026-04-19
+
+### Changed
+- Renamed `canary` mode to `quick` mode (tracked ahead of the 0.2.3 backward-compatible alias).
+- Hardened public repo surface documentation.
+- Bumped `actions/checkout` and `actions/setup-node` in CI.
+
+## [0.2.1] - 2026-03-02
+
+### Added
+- CI workflow, CHANGELOG, and community health files (CODE_OF_CONDUCT, SECURITY, CONTRIBUTING).
+- `llms.txt`, `AGENTS.md`, and `CLAUDE.md` for agent discoverability.
+
+### Fixed
+- CI test glob quoting for `node --test`.
+- npm `homepage` URL corrected from `lpci.ai` to `hermes-labs.ai`.
+
+## [0.2.3] - 2026-08-08
+
+### Changed
+- Standardized the documented CLI on `quick|full` modes.
+- Kept `canary` as a backward-compatible input alias that emits canonical `quick` artifacts.
+- Added the canonical `schema: "gate-result/v1"` discriminator while retaining deprecated `version` for one release.
+- Made the composite action execute its checked-out source and keep run artifacts in an explicit external directory.
+
+## [0.2.0] - 2026-02-25
+
+### Added
+- Four quality gates: lint (ESLint), typecheck (tsc), build, and Lighthouse
+- Bounded auto-repair loop with optional LLM-assisted patches via Ollama
+- Machine-readable escalation evidence (`.quick-gate/escalation.json`)
+- Changed-files mode for fast PR feedback
+- `quick` and `full` run modes
+- Broadened from Next.js-only to all TypeScript/ESLint projects
