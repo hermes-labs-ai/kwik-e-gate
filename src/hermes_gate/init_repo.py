@@ -438,7 +438,7 @@ def _detected_profile(root: Path, *, adapter: str = "native") -> str:
         "[review]",
         'provider = "jsonl"',
         f"argv = {json.dumps([reviewer])}",
-        "timeout_seconds = 180.0",
+        "timeout_seconds = 600.0",
         'material_severities = ["critical", "major"]',
         'material_categories = ["correctness", "security", "data-loss", "concurrency", "api-contract"]',
         "fallback_argv = []",

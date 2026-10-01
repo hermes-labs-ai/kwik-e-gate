@@ -175,7 +175,7 @@ def _grok_argv(binary: str, prompt: str) -> list[str]:
         "--no-subagents",
         "--disable-web-search",
         "--max-turns",
-        "1",
+        "8",
         "--tools",
         "",
         "--system-prompt-override",
@@ -196,7 +196,7 @@ def _fallback_disallowed_argv(binary: str, prompt: str) -> list[str]:
         "--no-subagents",
         "--disable-web-search",
         "--max-turns",
-        "1",
+        "8",
         "--disallowed-tools",
         DISALLOWED_TOOLS,
         "--system-prompt-override",
@@ -254,10 +254,51 @@ def _validate_findings(findings: list[dict[str, object]], paths: list[str]) -> l
     return findings
 
 
-def _review(diff: str, paths: list[str]) -> list[dict[str, object]]:
-    binary = _require_grok_oauth()
-    prompt = _build_prompt(diff, paths)
-    env = _child_env()
+def _envelope_incomplete(envelope: dict[str, object], returncode: int) -> str:
+    """Return a reason when the CLI did not finish a usable review."""
+    if returncode:
+        return f"exit {returncode}"
+    stop = envelope.get("stopReason")
+    if stop in {"cancelled", "error", "rejection"}:
+        return f"stopReason={stop}"
+    err = envelope.get("structuredOutputError") or envelope.get("structured_output_error")
+    if isinstance(err, str) and err.strip():
+        return err.strip()
+    return ""
+
+
+def _findings_from_run(
+    stdout: str, returncode: int, stderr: str, paths: list[str]
+) -> list[dict[str, object]]:
+    """Bind findings when present; refuse empty complete on incomplete CLI turns.
+
+    The Grok Build CLI can exit non-zero with stderr "max turns reached" while still
+    emitting a JSON envelope. Non-empty findings still fail-close. Empty findings are
+    accepted only on a finished turn (exit 0, end_turn, no structuredOutputError);
+    otherwise review stays unavailable so a cancelled empty payload cannot PASS.
+    """
+    try:
+        envelope = json.loads(stdout or "")
+    except json.JSONDecodeError as exc:
+        if returncode:
+            detail = (stderr or "").strip() or f"exit {returncode}"
+            raise ValueError(f"Grok reviewer exited {returncode}: {detail}") from exc
+        raise ValueError("Grok returned an invalid review object") from exc
+    if not isinstance(envelope, dict):
+        raise ValueError("Grok returned an invalid review object")
+    findings = _parse_envelope(stdout)
+    validated = _validate_findings(findings, paths)
+    if validated:
+        return validated
+    incomplete = _envelope_incomplete(envelope, returncode)
+    if incomplete:
+        detail = (stderr or "").strip()
+        suffix = f" ({detail})" if detail and detail not in incomplete else ""
+        raise ValueError(f"Grok review incomplete: {incomplete}{suffix}")
+    return validated
+
+
+def _run_grok_once(binary: str, prompt: str, env: dict[str, str]) -> subprocess.CompletedProcess[str]:
     argv = _grok_argv(binary, prompt)
     run = subprocess.run(
         argv,
@@ -277,10 +318,24 @@ def _review(diff: str, paths: list[str]) -> list[dict[str, object]]:
             env=env,
             check=False,
         )
-    if run.returncode:
-        raise ValueError(f"Grok reviewer exited {run.returncode}")
-    findings = _parse_envelope(run.stdout)
-    return _validate_findings(findings, paths)
+    return run
+
+
+def _review(diff: str, paths: list[str]) -> list[dict[str, object]]:
+    binary = _require_grok_oauth()
+    prompt = _build_prompt(diff, paths)
+    env = _child_env()
+    run = _run_grok_once(binary, prompt, env)
+    try:
+        return _findings_from_run(run.stdout or "", run.returncode or 0, run.stderr or "", paths)
+    except ValueError as exc:
+        # Fresh tool-less sessions occasionally cancel before structured output lands on
+        # low-signal patches (stderr: max turns reached / stopReason=cancelled with empty
+        # findings). Retry once; non-empty findings already succeed on the first attempt.
+        if "incomplete" not in str(exc):
+            raise
+        run = _run_grok_once(binary, prompt, env)
+        return _findings_from_run(run.stdout or "", run.returncode or 0, run.stderr or "", paths)
 
 
 def main() -> int:

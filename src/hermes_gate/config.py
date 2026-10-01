@@ -52,7 +52,7 @@ class LintLangSpec:
 class ReviewSpec:
     provider: str = "jsonl"
     argv: tuple[str, ...] = ("kwik-e-gate-review",)
-    timeout_seconds: float = 180.0
+    timeout_seconds: float = 600.0
     material_severities: tuple[str, ...] = ("critical", "major")
     material_categories: tuple[str, ...] = (
         "correctness",
@@ -196,7 +196,7 @@ def load_config(root: Path) -> GateConfig:
         review=ReviewSpec(
             provider=provider,
             argv=_strings(review.get("argv", list(ReviewSpec.argv)), "review.argv"),
-            timeout_seconds=_seconds(review.get("timeout_seconds", 180.0), "review.timeout_seconds"),
+            timeout_seconds=_seconds(review.get("timeout_seconds", 600.0), "review.timeout_seconds"),
             material_severities=tuple(
                 item.lower()
                 for item in _strings(

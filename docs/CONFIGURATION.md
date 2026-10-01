@@ -155,7 +155,7 @@ New profiles from `kwik-e-gate init` set:
 [review]
 provider = "jsonl"
 argv = ["kwik-e-gate-review"]
-timeout_seconds = 180.0
+timeout_seconds = 600.0
 material_severities = ["critical", "major"]
 material_categories = ["correctness", "security", "data-loss", "concurrency", "api-contract"]
 fallback_argv = []
@@ -164,8 +164,9 @@ fallback_argv = []
 Requirements: Grok Build CLI on `PATH` (`grok`), logged in via grok.com OAuth
 (`grok login` / `grok models` shows logged in). API keys are stripped from the
 child environment; the adapter never uses `XAI_API_KEY` / `GROK_API_KEY`. Each
-call is a fresh tool-less single-turn session (`--tools ""`, `--no-subagents`,
-`--disable-web-search`, `--max-turns 1`, no `--continue`/`--resume`). Findings
+call is a fresh tool-less session (`--tools ""`, `--no-subagents`,
+`--disable-web-search`, `--max-turns 8`, no `--continue`/`--resume`). Empty findings
+are accepted only on a finished turn; cancelled/max-turns empty envelopes stay unavailable. Findings
 must trace to changed lines with a concrete failing scenario (empty findings
 only after an actual review).
 

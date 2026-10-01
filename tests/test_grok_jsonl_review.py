@@ -14,6 +14,7 @@ from hermes_gate.grok_review import (
     API_KEY_ENV_VARS,
     VERSION,
     _fixture_diff,
+    _findings_from_run,
     _parse_envelope,
     _review,
     _selected_diff,
@@ -153,7 +154,7 @@ def test_review_strips_api_keys_and_uses_oauth_tool_less_invocation(
         assert "--continue" not in argv and "--resume" not in argv
         assert "--no-subagents" in argv
         assert "--disable-web-search" in argv
-        assert "--max-turns" in argv and argv[argv.index("--max-turns") + 1] == "1"
+        assert "--max-turns" in argv and argv[argv.index("--max-turns") + 1] == "8"
         assert "--tools" in argv and argv[argv.index("--tools") + 1] == ""
         assert "--json-schema" in argv
         for key in API_KEY_ENV_VARS:
@@ -215,3 +216,77 @@ def test_main_emits_jsonl_complete_with_mocked_review(
         "digest": "digest-abc",
         "reviewed_paths": ["a.py"],
     }
+
+
+def test_findings_from_run_keeps_findings_on_nonzero_exit() -> None:
+    finding = {
+        "severity": "major",
+        "category": "security",
+        "path": "a.py",
+        "line": 1,
+        "message": "prefix match bypasses proxy",
+    }
+    payload = json.dumps(
+        {
+            "text": json.dumps({"findings": [finding]}),
+            "structuredOutput": {"findings": [finding]},
+            "stopReason": "cancelled",
+            "structuredOutputError": "model did not produce structured output",
+        }
+    )
+    assert _findings_from_run(payload, 1, "Error: max turns reached", ["a.py"]) == [finding]
+
+
+def test_findings_from_run_rejects_empty_incomplete_review() -> None:
+    payload = json.dumps(
+        {
+            "text": '{"findings": []}',
+            "structuredOutput": None,
+            "stopReason": "cancelled",
+            "structuredOutputError": "model did not produce structured output",
+        }
+    )
+    with pytest.raises(ValueError, match="incomplete"):
+        _findings_from_run(payload, 1, "Error: max turns reached", ["a.py"])
+
+
+def test_findings_from_run_allows_empty_complete() -> None:
+    payload = json.dumps(
+        {
+            "text": '{"findings": []}',
+            "structuredOutput": {"findings": []},
+            "stopReason": "end_turn",
+        }
+    )
+    assert _findings_from_run(payload, 0, "", ["a.py"]) == []
+
+
+def test_review_retries_once_on_incomplete_empty(monkeypatch: pytest.MonkeyPatch) -> None:
+    calls: list[int] = []
+
+    def fake_which(name: str) -> str | None:
+        return "/fake/bin/grok" if name == "grok" else None
+
+    def fake_run(argv: list[str] | tuple[str, ...], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        if list(argv)[:2] == ["/fake/bin/grok", "models"]:
+            return subprocess.CompletedProcess(argv, 0, "You are logged in with grok.com.\n", "")
+        calls.append(1)
+        if len(calls) == 1:
+            payload = {
+                "text": '{"findings":[]}',
+                "structuredOutput": None,
+                "stopReason": "cancelled",
+                "structuredOutputError": "model did not produce structured output",
+            }
+            return subprocess.CompletedProcess(argv, 1, json.dumps(payload), "Error: max turns reached")
+        payload = {
+            "text": '{"findings":[]}',
+            "structuredOutput": {"findings": []},
+            "stopReason": "end_turn",
+        }
+        return subprocess.CompletedProcess(argv, 0, json.dumps(payload), "")
+
+    monkeypatch.setattr("hermes_gate.grok_review.shutil.which", fake_which)
+    monkeypatch.setattr("hermes_gate.grok_review.subprocess.run", fake_run)
+    assert _review("diff --git a/a.py b/a.py\n+x=1\n", ["a.py"]) == []
+    assert len(calls) == 2
