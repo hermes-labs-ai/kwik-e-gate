@@ -10,18 +10,18 @@ from typing import Any
 
 import pytest
 
+from hermes_gate.gitstate import scope_paths
 from hermes_gate.grok_review import (
     API_KEY_ENV_VARS,
     VERSION,
-    _fixture_diff,
     _findings_from_run,
+    _fixture_diff,
     _parse_envelope,
     _review,
     _selected_diff,
     _validate_findings,
     main,
 )
-from hermes_gate.gitstate import scope_paths
 
 
 def test_version_flag(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:

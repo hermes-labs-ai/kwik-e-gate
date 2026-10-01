@@ -210,7 +210,7 @@ def _parse_envelope(stdout: str) -> list[dict[str, object]]:
     except json.JSONDecodeError as exc:
         raise ValueError("Grok returned an invalid review object") from exc
     if not isinstance(envelope, dict):
-        raise ValueError("Grok returned an invalid review object")
+        raise TypeError("Grok returned an invalid review object")
     answer: object
     structured = envelope.get("structuredOutput", envelope.get("structured_output"))
     if isinstance(structured, dict):
@@ -224,7 +224,7 @@ def _parse_envelope(stdout: str) -> list[dict[str, object]]:
         except json.JSONDecodeError as exc:
             raise ValueError("Grok returned an invalid review object") from exc
     if not isinstance(answer, dict):
-        raise ValueError("Grok returned an invalid review object")
+        raise TypeError("Grok returned an invalid review object")
     findings = answer.get("findings")
     if not isinstance(findings, list):
         raise TypeError("Grok findings must be an array")
@@ -285,7 +285,7 @@ def _findings_from_run(
             raise ValueError(f"Grok reviewer exited {returncode}: {detail}") from exc
         raise ValueError("Grok returned an invalid review object") from exc
     if not isinstance(envelope, dict):
-        raise ValueError("Grok returned an invalid review object")
+        raise TypeError("Grok returned an invalid review object")
     findings = _parse_envelope(stdout)
     validated = _validate_findings(findings, paths)
     if validated:
