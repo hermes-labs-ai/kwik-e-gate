@@ -2,6 +2,7 @@
 
 ## 0.4.0 — unreleased consolidated candidate
 
+- Add Hermes-owned free Grok OAuth material review adapter (`hermes-gate-grok-review`): tool-less JSONL findings with Wittgenstein relational grounding; product default for new `init` profiles. CodeRabbit remains an optional plugin.
 - Bring the dependency-free receipt/routing core into the existing Quick Gate JS
   repository while retaining npm/PyPI package and JS Action contracts.
 - Add the source-pinned core Action at `.github/actions/kwik-e-gate`: no PyPI download.

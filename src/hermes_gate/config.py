@@ -50,8 +50,8 @@ class LintLangSpec:
 
 @dataclass(frozen=True)
 class ReviewSpec:
-    provider: str = "coderabbit"
-    argv: tuple[str, ...] = ("coderabbit", "review", "--agent")
+    provider: str = "jsonl"
+    argv: tuple[str, ...] = ("hermes-gate-grok-review",)
     timeout_seconds: float = 180.0
     material_severities: tuple[str, ...] = ("critical", "major")
     material_categories: tuple[str, ...] = (
@@ -168,7 +168,7 @@ def load_config(root: Path) -> GateConfig:
     review_required = gate.get("review_required", True)
     if not isinstance(review_required, bool):
         raise ConfigError("gate.review_required must be a boolean")
-    provider = str(review.get("provider", "coderabbit"))
+    provider = str(review.get("provider", ReviewSpec.provider))
     if provider not in SUPPORTED_REVIEW_PROVIDERS:
         raise ConfigError(
             f'review.provider "{provider}" is not a supported review provider; '
