@@ -50,9 +50,9 @@ class LintLangSpec:
 
 @dataclass(frozen=True)
 class ReviewSpec:
-    provider: str = "coderabbit"
-    argv: tuple[str, ...] = ("coderabbit", "review", "--agent")
-    timeout_seconds: float = 180.0
+    provider: str = "jsonl"
+    argv: tuple[str, ...] = ("kwik-e-gate-review",)
+    timeout_seconds: float = 600.0
     material_severities: tuple[str, ...] = ("critical", "major")
     material_categories: tuple[str, ...] = (
         "correctness",
@@ -168,7 +168,7 @@ def load_config(root: Path) -> GateConfig:
     review_required = gate.get("review_required", True)
     if not isinstance(review_required, bool):
         raise ConfigError("gate.review_required must be a boolean")
-    provider = str(review.get("provider", "coderabbit"))
+    provider = str(review.get("provider", ReviewSpec.provider))
     if provider not in SUPPORTED_REVIEW_PROVIDERS:
         raise ConfigError(
             f'review.provider "{provider}" is not a supported review provider; '
@@ -196,7 +196,7 @@ def load_config(root: Path) -> GateConfig:
         review=ReviewSpec(
             provider=provider,
             argv=_strings(review.get("argv", list(ReviewSpec.argv)), "review.argv"),
-            timeout_seconds=_seconds(review.get("timeout_seconds", 180.0), "review.timeout_seconds"),
+            timeout_seconds=_seconds(review.get("timeout_seconds", 600.0), "review.timeout_seconds"),
             material_severities=tuple(
                 item.lower()
                 for item in _strings(

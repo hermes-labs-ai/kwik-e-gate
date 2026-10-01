@@ -2,6 +2,9 @@
 
 ## 0.4.0 — unreleased consolidated candidate
 
+- Retry once when a fresh Grok session cancels before structured findings land; refuse cancelled/max-turns empty envelopes (no false PASS) while still binding non-empty findings when the CLI exits non-zero; raise `--max-turns` to 8 so structured JSON has room to finish on low-signal patches.
+- Align review timeout defaults with the Grok OAuth adapter (600s gate budget vs 540s child timeout) and point this repository's `.hermes/gate.toml` at `provider = "jsonl"` / `kwik-e-gate-review` so the product exercises its free default path.
+- Add Hermes-owned free Grok OAuth material review adapter (`kwik-e-gate-review`): tool-less JSONL findings with Wittgenstein relational grounding; product default for new `init` profiles. CodeRabbit remains an optional plugin. (Working name during development was `hermes-gate-grok-review`; not retained as a dual entry point.)
 - Bring the dependency-free receipt/routing core into the existing Quick Gate JS
   repository while retaining npm/PyPI package and JS Action contracts.
 - Add the source-pinned core Action at `.github/actions/kwik-e-gate`: no PyPI download.

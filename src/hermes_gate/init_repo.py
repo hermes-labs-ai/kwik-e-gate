@@ -360,7 +360,7 @@ def _detected_profile(root: Path, *, adapter: str = "native") -> str:
     full: list[tuple[str, list[str], float, list[str]]] = []
     repair: list[tuple[str, list[str], float, list[str]]] = []
     adapter_status = "NATIVE_DEFAULT" if adapter == "native" else "EXPLICIT_ADAPTER"
-    reviewer = "coderabbit"
+    reviewer = "kwik-e-gate-review"
     if python:
         fast.append(
             (
@@ -436,9 +436,9 @@ def _detected_profile(root: Path, *, adapter: str = "native") -> str:
         'blocking_threshold = "MEDIUM"',
         "",
         "[review]",
-        'provider = "coderabbit"',
-        f"argv = {json.dumps([reviewer, 'review', '--agent'])}",
-        "timeout_seconds = 180.0",
+        'provider = "jsonl"',
+        f"argv = {json.dumps([reviewer])}",
+        "timeout_seconds = 600.0",
         'material_severities = ["critical", "major"]',
         'material_categories = ["correctness", "security", "data-loss", "concurrency", "api-contract"]',
         "fallback_argv = []",

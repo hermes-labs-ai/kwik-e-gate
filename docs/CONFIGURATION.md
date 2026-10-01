@@ -107,8 +107,12 @@ configuration to its snapshot and supports Unicode/space/newline file names.
 
 - `[[repair]]`: bounded deterministic repair command; mutates source; separate from run.
 - `[lintlang]`: optional installed static prompt/config scanner, configured argv/globs.
-- `[review]`: explicit installed provider, `coderabbit` or bounded `jsonl` output;
-  provider argv, timeout, material severities/categories and optional fallback argv.
+- `[review]`: explicit installed provider. Product default is Hermes-owned free
+  Grok OAuth material review (`provider = "jsonl"`, `argv = ["kwik-e-gate-review"]`):
+  tool-less, fresh session, Wittgenstein-relational findings bound to the selected
+  patch. `coderabbit` remains an optional plugin provider. Bounded `jsonl` is the
+  output contract for Hermes adapters (Grok or Claude). Configure argv, timeout,
+  material severities/categories and optional fallback argv.
 - `boundary commit|push|pr-create|pr-ready`: validate required receipts, never perform
   the Git/PR action or grant authorization.
 - `install-codex` and `claude-plugin/`: explicit hook installation. Hooks inspect/advise
@@ -142,6 +146,40 @@ revokes the install manifest. A later fresh install therefore remains reversible
 If an older install or interrupted rollback left a backup, initialization accepts it
 only when the corresponding owner file still exists with identical bytes. A backup
 without that file, or with different bytes, parks until the owner resolves it.
+
+### Hermes Grok material review (default free path)
+
+New profiles from `kwik-e-gate init` set:
+
+```toml
+[review]
+provider = "jsonl"
+argv = ["kwik-e-gate-review"]
+timeout_seconds = 600.0
+material_severities = ["critical", "major"]
+material_categories = ["correctness", "security", "data-loss", "concurrency", "api-contract"]
+fallback_argv = []
+```
+
+Requirements: Grok Build CLI on `PATH` (`grok`), logged in via grok.com OAuth
+(`grok login` / `grok models` shows logged in). API keys are stripped from the
+child environment; the adapter never uses `XAI_API_KEY` / `GROK_API_KEY`. Each
+call is a fresh tool-less session (`--tools ""`, `--no-subagents`,
+`--disable-web-search`, `--max-turns 8`, no `--continue`/`--resume`). Empty findings
+are accepted only on a finished turn; cancelled/max-turns empty envelopes stay unavailable. Findings
+must trace to changed lines with a concrete failing scenario (empty findings
+only after an actual review).
+
+Optional CodeRabbit plugin (not the product default):
+
+```toml
+[review]
+provider = "coderabbit"
+argv = ["coderabbit", "review", "--agent"]
+```
+
+Optional Claude OAuth adapter: `argv = ["hermes-gate-claude-review"]` with the
+same `provider = "jsonl"` contract.
 
 ### Hook command scope
 

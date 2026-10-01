@@ -10,7 +10,7 @@
   <a href="#quickstart">Quickstart</a> · <a href="#how-it-works">How it works</a> · <a href="#real-example">Real example</a> · <a href="#github-action">GitHub Action</a>
 </p>
 
-Kwik-e-gate is a free, local gate for coding agents. It runs the lint, test, build, and other commands **your repository declares**; chooses a fast or full path from the changed files and project policy; and records what actually ran. No daemon, API key, or model is required. An optional reviewer can add semantic judgment when one is available.
+Kwik-e-gate is a free, local gate for coding agents. It runs the lint, test, build, and other commands **your repository declares**; chooses a fast or full path from the changed files and project policy; and records what actually ran. No daemon, API key, or model is required. An optional Hermes material reviewer (default: free Grok OAuth via `kwik-e-gate-review`; CodeRabbit remains an optional plugin) can add semantic judgment when one is available.
 
 ## Quickstart
 
