@@ -288,7 +288,7 @@ def main() -> int:
         print(VERSION)
         return 0
     if sys.argv[1:]:
-        print("usage: hermes-gate-grok-review", file=sys.stderr)
+        print("usage: kwik-e-gate-review", file=sys.stderr)
         return 2
     try:
         digest = os.environ["HERMES_GATE_DIFF_DIGEST"]

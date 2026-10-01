@@ -108,7 +108,7 @@ configuration to its snapshot and supports Unicode/space/newline file names.
 - `[[repair]]`: bounded deterministic repair command; mutates source; separate from run.
 - `[lintlang]`: optional installed static prompt/config scanner, configured argv/globs.
 - `[review]`: explicit installed provider. Product default is Hermes-owned free
-  Grok OAuth material review (`provider = "jsonl"`, `argv = ["hermes-gate-grok-review"]`):
+  Grok OAuth material review (`provider = "jsonl"`, `argv = ["kwik-e-gate-review"]`):
   tool-less, fresh session, Wittgenstein-relational findings bound to the selected
   patch. `coderabbit` remains an optional plugin provider. Bounded `jsonl` is the
   output contract for Hermes adapters (Grok or Claude). Configure argv, timeout,
@@ -154,7 +154,7 @@ New profiles from `kwik-e-gate init` set:
 ```toml
 [review]
 provider = "jsonl"
-argv = ["hermes-gate-grok-review"]
+argv = ["kwik-e-gate-review"]
 timeout_seconds = 180.0
 material_severities = ["critical", "major"]
 material_categories = ["correctness", "security", "data-loss", "concurrency", "api-contract"]

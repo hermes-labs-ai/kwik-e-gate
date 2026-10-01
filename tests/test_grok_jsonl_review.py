@@ -24,7 +24,7 @@ from hermes_gate.gitstate import scope_paths
 
 
 def test_version_flag(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
-    monkeypatch.setattr(sys, "argv", ["hermes-gate-grok-review", "--version"])
+    monkeypatch.setattr(sys, "argv", ["kwik-e-gate-review", "--version"])
     assert main() == 0
     assert capsys.readouterr().out.strip() == VERSION
 
@@ -32,10 +32,10 @@ def test_version_flag(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFix
 def test_usage_rejects_extra_args(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    monkeypatch.setattr(sys, "argv", ["hermes-gate-grok-review", "--diff-file", "x"])
+    monkeypatch.setattr(sys, "argv", ["kwik-e-gate-review", "--diff-file", "x"])
     assert main() == 2
     output = capsys.readouterr()
-    assert "usage: hermes-gate-grok-review" in output.err
+    assert "usage: kwik-e-gate-review" in output.err
     assert '"type": "complete"' not in output.out
 
 
@@ -191,7 +191,7 @@ def test_main_emits_jsonl_complete_with_mocked_review(
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv("HERMES_GATE_DIFF_DIGEST", "digest-abc")
     monkeypatch.setenv("HERMES_GATE_REVIEWED_PATHS", json.dumps(["a.py"]))
-    monkeypatch.setattr(sys, "argv", ["hermes-gate-grok-review"])
+    monkeypatch.setattr(sys, "argv", ["kwik-e-gate-review"])
 
     finding = {
         "severity": "major",

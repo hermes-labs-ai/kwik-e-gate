@@ -51,7 +51,7 @@ class LintLangSpec:
 @dataclass(frozen=True)
 class ReviewSpec:
     provider: str = "jsonl"
-    argv: tuple[str, ...] = ("hermes-gate-grok-review",)
+    argv: tuple[str, ...] = ("kwik-e-gate-review",)
     timeout_seconds: float = 180.0
     material_severities: tuple[str, ...] = ("critical", "major")
     material_categories: tuple[str, ...] = (

@@ -360,7 +360,7 @@ def _detected_profile(root: Path, *, adapter: str = "native") -> str:
     full: list[tuple[str, list[str], float, list[str]]] = []
     repair: list[tuple[str, list[str], float, list[str]]] = []
     adapter_status = "NATIVE_DEFAULT" if adapter == "native" else "EXPLICIT_ADAPTER"
-    reviewer = "hermes-gate-grok-review"
+    reviewer = "kwik-e-gate-review"
     if python:
         fast.append(
             (
