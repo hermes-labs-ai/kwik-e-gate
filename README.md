@@ -71,7 +71,7 @@ The source-pinned Action runs the core without installing the unreleased PyPI pa
   with:
     fetch-depth: 0
     persist-credentials: false
-- uses: hermes-labs-ai/kwik-e-gate/.github/actions/kwik-e-gate@5d6b486791a084bc312055e350983881dacbf512
+- uses: hermes-labs-ai/kwik-e-gate/.github/actions/kwik-e-gate@266898a2b72a2bf92aa4608a6123999eb00b7f6b
   id: gate
   with:
     mode: full
