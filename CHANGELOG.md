@@ -2,6 +2,7 @@
 
 ## 0.4.0 — unreleased consolidated candidate
 
+- Publish a bounded GitHub Actions job summary from the source-pinned core Action.
 - Bring the dependency-free receipt/routing core into the existing Quick Gate JS
   repository while retaining npm/PyPI package and JS Action contracts.
 - Add the source-pinned core Action at `.github/actions/kwik-e-gate`: no PyPI download.

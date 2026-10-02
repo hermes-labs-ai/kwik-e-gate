@@ -71,7 +71,7 @@ The source-pinned Action runs the core without installing the unreleased PyPI pa
   with:
     fetch-depth: 0
     persist-credentials: false
-- uses: hermes-labs-ai/kwik-e-gate/.github/actions/kwik-e-gate@5d6b486791a084bc312055e350983881dacbf512
+- uses: hermes-labs-ai/kwik-e-gate/.github/actions/kwik-e-gate@266898a2b72a2bf92aa4608a6123999eb00b7f6b
   id: gate
   with:
     mode: full
@@ -82,7 +82,7 @@ The source-pinned Action runs the core without installing the unreleased PyPI pa
     path: ${{ steps.gate.outputs.receipt-path }}
 ```
 
-The commit pin keeps the Action source fixed. The Action exports `status` and `receipt-path`; a path is available when receipt export succeeds. For unusual detached or merge checkouts, provide its `base` input. [CI examples](docs/CI-ADMISSION.md) show scoped profiles for real repositories.
+The commit pin keeps the Action source fixed. The Action exports `status` and `receipt-path`; a path is available when receipt export succeeds. PASS and FAIL runs also publish a concise GitHub job summary (status, routing/mode, check counts, and receipt location) without dumping the full receipt or command output. For unusual detached or merge checkouts, provide its `base` input. [CI examples](docs/CI-ADMISSION.md) show scoped profiles for real repositories.
 
 ## What a receipt means
 

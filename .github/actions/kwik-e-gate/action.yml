@@ -42,3 +42,13 @@ runs:
         KWIK_GATE_DIRECTORY: ${{ inputs.working-directory }}
         KWIK_GATE_BASE: ${{ inputs.base }}
       run: python -I "$GITHUB_ACTION_PATH/run.py"
+    - name: Publish Kwik-e-gate summary
+      if: always()
+      shell: bash
+      env:
+        GATE_STATUS: ${{ steps.gate.outputs.status }}
+        RECEIPT_PATH: ${{ steps.gate.outputs.receipt-path }}
+      run: |
+        python -I "$GITHUB_ACTION_PATH/ci_summary.py" \
+          --status "$GATE_STATUS" \
+          --receipt "$RECEIPT_PATH" >> "$GITHUB_STEP_SUMMARY" || true
