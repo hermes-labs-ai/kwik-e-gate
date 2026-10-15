@@ -18,8 +18,10 @@ ACTION_VERSIONS = {
     "checkout": "3d3c42e5aac5ba805825da76410c181273ba90b1",
     "setup-python": "5fda3b95a4ea91299a34e894583c3862153e4b97",
     "setup-node": "820762786026740c76f36085b0efc47a31fe5020",
+    "setup-pnpm": "0977fd99725f1db4007ccb2928dbb4e90d06cc86",
     "upload-artifact": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
 }
+DEFAULT_PNPM_VERSION = "12.11.2"
 INTEGRATION_FILES = frozenset({
     ".hermes/gate.toml",
     ".hermes/hermes_gate_runner.py",
@@ -353,6 +355,10 @@ def verify_runner(root: Path) -> tuple[bool, str]:
     return actual == expected, actual
 
 
+def _javascript_package_manager(root: Path) -> str:
+    return "pnpm" if (root / "pnpm-lock.yaml").exists() else "npm"
+
+
 def _detected_profile(root: Path, *, adapter: str = "native") -> str:
     python = (root / "pyproject.toml").is_file() or (root / "requirements.txt").is_file()
     javascript = (root / "package.json").is_file()
@@ -390,7 +396,7 @@ def _detected_profile(root: Path, *, adapter: str = "native") -> str:
             repair.append(("ruff-fix", ["ruff", "check", "--fix", "{files}"], 8.0, ["**/*.py"]))
     if javascript:
         package = _package_scripts(root / "package.json")
-        manager = "pnpm" if (root / "pnpm-lock.yaml").exists() else "npm"
+        manager = _javascript_package_manager(root)
         if "lint" in package:
             fast.append(
                 (
@@ -489,16 +495,28 @@ def _workflow(root: Path) -> str:
             ]
         )
     if (root / "package.json").is_file():
-        install_command = "npm ci" if (root / "package-lock.json").is_file() else "npm install"
         steps.extend(
             [
                 f"      - uses: actions/setup-node@{ACTION_VERSIONS['setup-node']}",
                 "        with:",
                 "          node-version: '24'",
-                "      - name: Install JavaScript dependencies",
-                f"        run: {install_command}",
             ]
         )
+        if _javascript_package_manager(root) == "pnpm":
+            steps.extend([
+                f"      - uses: pnpm/action-setup@{ACTION_VERSIONS['setup-pnpm']}",
+                "        with:",
+                "          run_install: false",
+            ])
+            if not _declares_pnpm_version(root / "package.json"):
+                steps.append(f"          version: '{DEFAULT_PNPM_VERSION}'")
+            install_command = "pnpm install --frozen-lockfile"
+        else:
+            install_command = "npm ci" if (root / "package-lock.json").is_file() else "npm install"
+        steps.extend([
+            "      - name: Install JavaScript dependencies",
+            f"        run: {install_command}",
+        ])
     try:
         own_project = tomllib.loads((root / "pyproject.toml").read_text()).get("project", {})
     except (OSError, tomllib.TOMLDecodeError):
@@ -550,6 +568,26 @@ def _workflow(root: Path) -> str:
             *steps,
             "",
         ]
+    )
+
+
+def _declares_pnpm_version(path: Path) -> bool:
+    try:
+        package = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    if not isinstance(package, dict):
+        return False
+    manager = package.get("packageManager")
+    if isinstance(manager, str) and manager.startswith("pnpm@") and manager[5:].strip():
+        return True
+    engines = package.get("devEngines")
+    declared = engines.get("packageManager") if isinstance(engines, dict) else None
+    return (
+        isinstance(declared, dict)
+        and declared.get("name") == "pnpm"
+        and isinstance(declared.get("version"), str)
+        and bool(declared["version"].strip())
     )
 
 

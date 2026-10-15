@@ -2,6 +2,8 @@
 
 ## 0.4.0 — unreleased consolidated candidate
 
+- Generate pnpm CI bootstrap for projects with `pnpm-lock.yaml`, honoring the
+  declared pnpm version and installing once with `--frozen-lockfile`.
 - Publish a bounded GitHub Actions job summary from the source-pinned core Action.
 - Bring the dependency-free receipt/routing core into the existing Quick Gate JS
   repository while retaining npm/PyPI package and JS Action contracts.
