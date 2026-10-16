@@ -70,8 +70,19 @@ With the core installed from this checkout, run `hermes-gate fast`, `hermes-gate
 contracts, Python lint/parse checks and whitespace; full runs both `pytest` and
 `npm test`. The Python full stage allows 360 seconds; fast retains its eight-second
 command budget.
-Independent review uses CodeRabbit. A missing reviewer is a review limitation,
-not a test failure or a successful review.
+Maintainer review uses Gate's bundled `hermes-gate-claude-review` adapter with
+an existing Claude Code subscription login. An unavailable reviewer holds review
+acceptance. This development check does not add a model requirement to the core.
+
+Install the maintainer CLI from this public source commit in an isolated tool
+environment; the PyPI 0.1.7 artifact does not include JSONL review or this adapter:
+
+```bash
+uv tool install --force 'git+https://github.com/hermes-labs-ai/hermes-gate.git@f20db03fa5f63fc8c5bc11773f4c4b71cb2b61a9'
+```
+
+Keep the tool's executable directory on `PATH` so both `hermes-gate` and
+`hermes-gate-claude-review` resolve from that installation.
 
 CI exercises the JS adapter on Node 18/20/22/24 and the core on Python 3.11/3.14; the
 generated quality rail runs both declared suites and preserves a receipt.
