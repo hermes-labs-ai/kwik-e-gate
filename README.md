@@ -1,9 +1,9 @@
-<h1 align="center">Kwik-e-gate</h1>
+<h1 align="center">Kwik-E-Gate</h1>
 
-> **Experimental / work in progress:** Kwik-e-gate is under active development. Interfaces and behavior may change; evaluate it on your own repositories before relying on it.
+> **Experimental / work in progress:** Kwik-E-Gate is under active development. Interfaces and behavior may change; evaluate it on your own repositories before relying on it.
 
 <p align="center">
-  <img src="docs/assets/kwik-e-gate-header.jpg" alt="Kwik-e-gate — don't forget the receipt">
+  <img src="docs/assets/kwik-e-gate-header.jpg" alt="Kwik-E-Gate — don't forget the receipt">
 </p>
 
 <p align="center"><strong>Run the checks. Get PASS or FAIL. Keep the receipt.</strong></p>
@@ -12,7 +12,7 @@
   <a href="#quickstart">Quickstart</a> · <a href="#how-it-works">How it works</a> · <a href="#real-example">Real example</a> · <a href="#github-action">GitHub Action</a>
 </p>
 
-Kwik-e-gate is a free, local gate for coding agents. It runs the lint, test, build, and other commands **your repository declares**; chooses a fast or full path from the changed files and project policy; and records what actually ran. No daemon, API key, or model is required. An optional reviewer can add semantic judgment when one is available.
+Kwik-E-Gate is a free, local gate for coding agents. It runs the lint, test, build, and other commands **your repository declares**; chooses a fast or full path from the changed files and project policy; and records what actually ran. No daemon, API key, or model is required. An optional reviewer can add semantic judgment when one is available.
 
 ## Quickstart
 
@@ -44,7 +44,7 @@ The CLI writes JSON to stdout, including the result, route, and receipt path. Re
 
 ## How it works
 
-1. **You choose the checks.** `.hermes/gate.toml` names the project's commands and the paths they cover. Kwik-e-gate never installs ESLint, pytest, or other project tools for you.
+1. **You choose the checks.** `.hermes/gate.toml` names the project's commands and the paths they cover. Kwik-E-Gate never installs ESLint, pytest, or other project tools for you.
 2. **It picks a route.** Ordinary source edits use matching fast checks. Changes to tests, dependencies, CI, gate configuration, auth, schemas, or migrations escalate to full. `kwik-e-gate plan` shows the choice and why; `--mode fast` or `--mode full` selects one explicitly.
 3. **It runs and receipts.** The result records checks, selected paths, outputs, tool versions, and an input/contract binding. Changing included code or gate configuration makes an earlier receipt stale. Run again to get fresh evidence.
 
@@ -54,7 +54,7 @@ The routing decision is local and deterministic. It does not read the code to in
 
 ## Real example
 
-While building Kwik-e-gate, we caught a scanner-scope bug in its own fast gate. The profile selected LintLang for `AGENTS.md`, but the old runner also sent `app.py` and `notes/SKILL.md` to that scanner. An out-of-scope warning failed the run. The fix passed only `AGENTS.md` to LintLang; the same changed inputs and diff digest then passed. Both runs produced receipts.
+While building Kwik-E-Gate, we caught a scanner-scope bug in its own fast gate. The profile selected LintLang for `AGENTS.md`, but the old runner also sent `app.py` and `notes/SKILL.md` to that scanner. An out-of-scope warning failed the run. The fix passed only `AGENTS.md` to LintLang; the same changed inputs and diff digest then passed. Both runs produced receipts.
 
 | | Before | After |
 | --- | --- | --- |
