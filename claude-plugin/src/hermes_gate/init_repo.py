@@ -17,7 +17,7 @@ from .gitstate import ContentReadError, git_dir, repo_identity, snapshot
 ACTION_VERSIONS = {
     "checkout": "3d3c42e5aac5ba805825da76410c181273ba90b1",
     "setup-python": "5fda3b95a4ea91299a34e894583c3862153e4b97",
-    "setup-node": "820762786026740c76f36085b0efc47a31fe5020",
+    "setup-node": "949feb2413d6458794dcd2491c4babbbce0c15c1",
     "setup-pnpm": "0977fd99725f1db4007ccb2928dbb4e90d06cc86",
     "upload-artifact": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
 }

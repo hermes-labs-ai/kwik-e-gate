@@ -2,6 +2,8 @@
 
 ## 0.4.0 — unreleased consolidated candidate
 
+- Keep generated workflows and the bundled plugin aligned with the pinned
+  `actions/setup-node` 7.1.0 upgrade.
 - Generate pnpm CI bootstrap for projects with `pnpm-lock.yaml`, honoring the
   declared pnpm version and installing once with `--frozen-lockfile`.
 - Publish a bounded GitHub Actions job summary from the source-pinned core Action.
