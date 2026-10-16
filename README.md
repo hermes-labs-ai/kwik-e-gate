@@ -1,5 +1,7 @@
 <h1 align="center">Kwik-e-gate</h1>
 
+> **Experimental / work in progress:** Kwik-e-gate is under active development. Interfaces and behavior may change; evaluate it on your own repositories before relying on it.
+
 <p align="center">
   <img src="docs/assets/kwik-e-gate-header.jpg" alt="Kwik-e-gate — don't forget the receipt">
 </p>
