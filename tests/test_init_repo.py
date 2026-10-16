@@ -4,9 +4,11 @@ import hashlib
 import json
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 import pytest
+import yaml
 
 from hermes_gate import __version__, init_repo
 from hermes_gate.engine import fast
@@ -16,6 +18,86 @@ from hermes_gate.init_repo import initialize, uninstall, verify_runner
 
 def git(root: Path, *args: str) -> None:
     subprocess.run(["git", "-C", str(root), *args], check=True, capture_output=True)
+
+
+@pytest.mark.parametrize(
+    ("lockfiles", "metadata", "manager", "pnpm_version"),
+    [
+        (["pnpm-lock.yaml"], {"packageManager": "pnpm@9.15.9"}, "pnpm", None),
+        (["pnpm-lock.yaml"], {}, "pnpm", "12.11.2"),
+        (["pnpm-lock.yaml", "package-lock.json"], {}, "pnpm", "12.11.2"),
+        (["pnpm-lock.yaml"], {"packageManager": "npm@10.9.2"}, "pnpm", "12.11.2"),
+        (["pnpm-lock.yaml"], {"packageManager": 42}, "pnpm", "12.11.2"),
+        (["pnpm-lock.yaml"], {"packageManager": "pnpm@"}, "pnpm", "12.11.2"),
+        (
+            ["pnpm-lock.yaml"],
+            {"devEngines": {"packageManager": {"name": "pnpm", "version": "10.20.0"}}},
+            "pnpm",
+            None,
+        ),
+        (["package-lock.json"], {}, "npm", None),
+        ([], {}, "npm", None),
+    ],
+)
+def test_init_workflow_installs_the_selected_javascript_manager(
+    tmp_path: Path, lockfiles: list[str], metadata: dict, manager: str,
+    pnpm_version: str | None,
+) -> None:
+    root = tmp_path / "repo"
+    root.mkdir()
+    git(root, "init", "-q")
+    (root / "package.json").write_text(json.dumps({
+        "name": "fixture", "scripts": {"lint": "true", "test": "true", "build": "true"},
+        **metadata,
+    }))
+    for lockfile in lockfiles:
+        (root / lockfile).write_text("{}\n")
+
+    assert initialize(root)["status"] == "PASS"
+
+    profile = tomllib.loads((root / ".hermes/gate.toml").read_text())
+    assert {stage["argv"][0] for stage in profile["full"]} == {manager}
+    workflow = yaml.safe_load((root / ".github/workflows/hermes-quality.yml").read_text())
+    steps = workflow["jobs"]["full"]["steps"]
+    installs = [(index, step) for index, step in enumerate(steps)
+                if step.get("name") == "Install JavaScript dependencies"]
+    assert len(installs) == 1
+    install_index, install = installs[0]
+    node_index = next(index for index, step in enumerate(steps)
+                      if step.get("uses", "").startswith("actions/setup-node@"))
+    assert steps[node_index]["with"]["node-version"] == "24"
+    full_index = next(index for index, step in enumerate(steps)
+                      if step.get("name") == "Run declared full gate against the pull request range")
+    assert node_index < install_index < full_index
+    pnpm_steps = [(index, step) for index, step in enumerate(steps)
+                  if step.get("uses", "").startswith("pnpm/action-setup@")]
+    if manager == "pnpm":
+        assert len(pnpm_steps) == 1
+        pnpm_index, pnpm_setup = pnpm_steps[0]
+        assert node_index < pnpm_index < install_index
+        assert pnpm_setup["uses"] == (
+            "pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86"
+        )
+        assert pnpm_setup["with"]["run_install"] is False
+        assert pnpm_setup["with"].get("version") == pnpm_version
+        assert install["run"] == "pnpm install --frozen-lockfile"
+    else:
+        assert not pnpm_steps
+        assert install["run"] == ("npm ci" if "package-lock.json" in lockfiles else "npm install")
+
+
+def test_init_python_only_workflow_does_not_install_javascript_tools(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    root.mkdir()
+    git(root, "init", "-q")
+    (root / "pyproject.toml").write_text("[project]\nname='fixture'\nversion='0'\n")
+
+    assert initialize(root)["status"] == "PASS"
+
+    workflow = yaml.safe_load((root / ".github/workflows/hermes-quality.yml").read_text())
+    steps = workflow["jobs"]["full"]["steps"]
+    assert not any(step.get("uses", "").startswith(("actions/setup-node@", "pnpm/"))
+                   or step.get("name") == "Install JavaScript dependencies" for step in steps)
 
 
 def test_init_generates_checksum_bound_runner_and_rollback(tmp_path: Path) -> None:
